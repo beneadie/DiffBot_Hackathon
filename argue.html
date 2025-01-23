@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Argue with Your Doctor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            white-space: pre-wrap; /* Preserve formatting and line breaks */
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            max-height: 300px; /* Set a maximum height for the response box */
+            overflow-y: auto; /* Make the box scrollable */
+        }
+        .instructions {
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Argue with Your Doctor</h1>
+        <div>See if doctors around the world would do the same thing.</div>
+        <div class="instructions">
+            Please enter your <strong>Condition</strong> and the <strong>Treatment</strong> your doctor recommended.
+        </div>
+        <div>This information is all verified by Diffbot which is probably correct.</div>
+
+        <form id="apiForm">
+            <label for="condition">Condition:</label>
+            <input type="text" id="condition" name="condition" required>
+
+            <label for="treatment">Treatment:</label>
+            <input type="text" id="treatment" name="treatment" required>
+
+            <button type="submit">Submit</button>
+        </form>
+
+        <!-- Section to display the API response -->
+        <div class="response" id="apiResponse">
+            <strong>API Response:</strong> <span id="responseText">No response yet.</span>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('apiForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+
+            // Get the button element
+            const submitButton = document.querySelector('button[type="submit"]');
+
+            // Change the button text and disable it
+            submitButton.textContent = 'Waiting for response...';
+            submitButton.disabled = true;
+
+            // Get the values from the form
+            const condition = document.getElementById('condition').value;
+            const treatment = document.getElementById('treatment').value;
+
+            // Replace with your FastAPI endpoint
+            const apiUrl = 'http://127.0.0.1:8000/diffbot';
+
+            // Data to be sent to the API
+            const data = {
+                condition: condition,
+                treatment: treatment
+            };
+
+            // Make the API call using fetch
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json()) // Parse the JSON response
+            .then(result => {
+                // Extract the "response" field from the JSON
+                const responseText = result.response;
+
+                // Display the API response on the webpage
+                document.getElementById('responseText').textContent = responseText;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('responseText').textContent = 'An error occurred while calling the API.';
+            })
+            .finally(() => {
+                // Revert the button to its original state
+                submitButton.textContent = 'Submit';
+                submitButton.disabled = false;
+            });
+        });
+    </script>
+
+</body>
+</html>
