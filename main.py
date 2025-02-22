@@ -35,7 +35,7 @@ def read_item(request: TreatmentRequest):
 
     client = OpenAI(
         base_url="https://llm.diffbot.com/rag/v1",
-        api_key="a3b011f40fde0a5331edecd0f7bd9874"
+        api_key="your-api-key"
     )
 
     completion = client.chat.completions.create(
